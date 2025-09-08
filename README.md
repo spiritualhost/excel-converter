@@ -10,3 +10,12 @@ The conversion to .csv additionally will not support multi-page client files, as
 The python script combines two powerful libraries to create an efficient file conversion process with the potential to be extended in many ways: watchdog (a system event monitor) and pandas (a data frame handling library). 
 
 The system monitor watches for the creation of files in the "input" directory, then processes them dependent on their type. 
+
+## The Build
+
+The build was done with Pyinstaller and removes the need to implement a Python interpreter on the endpoint the script is used on. Updates to source code will not be built into the executable until compiled again after pull, so ensure that this is done before updating in production. 
+
+The build is located in the dist/ directory. 
+
+## Dependencies
+

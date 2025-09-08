@@ -1,3 +1,5 @@
 #Ignore confidential
 current/
+build/
 vert_log.log
+excel_converter.spec

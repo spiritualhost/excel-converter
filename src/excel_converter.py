@@ -21,7 +21,7 @@
 #Date: __/__/____ by _______________
 #-------------------------------------------------------------------
 
-import os, time, logging, re
+import os, time, logging, re, sys
 import pandas as pd
 
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
@@ -95,8 +95,44 @@ def to_csv(file: str):
     except Exception as e:
         logger.warning(f"Conversion exception: {e}")
 
+#Ensure necessary folder structure exists
+def ensure_struct():
+    
+    #Create the input folder if not there
+    if not os.path.isdir("input"):
+        try:
+            os.mkdir("input")
+            logger.info("Created input folder.")
+        except Exception as e:
+            logger.critical(f"Error creating input folder: {e}")
+            sys.exit(0) #Close the program -- it can't continue without these folders
+
+    #Create the output folder if not there
+    if not os.path.isdir("output"):
+        try:
+            os.mkdir("output")
+            logger.info("Created output folder.")
+        except Exception as e:
+            logger.critical(f"Error creating output folder: {e}")
+            sys.exit(0) #Close the program -- it can't continue without these folders
+
+    #Create the manual review folder if not there
+    if not os.path.isdir("manrev"):
+        try:
+            os.mkdir("manrev")
+            logger.info("Created manual review folder.")
+        except Exception as e:
+            logger.critical(f"Error creating manual review folder: {e}")
+            sys.exit(0) #Close the program -- it can't continue without these folders
+
+    logger.info("Folder structure ensured. The program can now continue.")
+
+
+
 #Fake event pitcher for items still in folder at script restart
-#def existing(handler, input_path):
+"""def existing(handler, input_path):
+    for file in os.listdir(input_path):
+        full_path = os.path.join(input)"""
 
 
 
@@ -136,15 +172,15 @@ class sysmon(FileSystemEventHandler):
         #Move files that don't belong to another folder for manual review (/manrev)
         else:
             try:
-                bad_file_path = event.src_path
-                filename_old = os.path.basename(bad_file_path)
-                print(filename_old)
-                os.rename(f"{bad_file_path}", f"{os.path.join("./manrev/", filename_old)}")
-                logger.info(f"Unknown file type found in input folder: {filename_old}. Moved to manrev/ for manual review.")
+                if file_wait(event.src_path):
+                    bad_file_path = event.src_path
+                    filename_old = os.path.basename(bad_file_path)
+                    os.rename(f"{bad_file_path}", f"{os.path.join("./manrev/", filename_old)}")
+                    logger.info(f"Unknown file type found in input folder: {filename_old}. Moved to manrev/ for manual review.")
             
             #Critical error: bad file squatting in input folder
             except Exception as e:
-                logger.critical(f"Critical error: bad file squatting in input folder. Remove {filename_old} manually then continue program.")
+                logger.critical(f"Critical error: bad file squatting in input folder. Remove {filename_old} manually then continue program. Error code: {e}")
 
             
     #Any system event involving the specified folder
@@ -179,6 +215,9 @@ if __name__ == "__main__":
     #Creating and configuring a logger
     logger = logging.getLogger()
 
+    #Ensure the necessary folder structure exists
+    ensure_struct()
+
     #Tell the observer which directory to watch
     #Use os.path.join() if not in same directory
     input_path = "./input"
@@ -187,12 +226,16 @@ if __name__ == "__main__":
     event_handler = sysmon()
     observer = Observer()
 
+    #Process existing files by simulating events
+
+
     #Schedule an observer thread to monitor the specified path with the custom handler
     #Recursive = true means it will also handle subdirectories
     observer.schedule(event_handler, input_path, recursive=True)
 
     #Start a thread that wakes up on events from the system
     observer.start()
+    logger.info("Observer started.")
 
     #Script runs at all times, constantly sleeping by 1 sec until a keyboard interrupt (Ctrl+C)
     try:
