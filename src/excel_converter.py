@@ -127,15 +127,19 @@ def ensure_struct():
 
     logger.info("Folder structure ensured. The program can now continue.")
 
-
-
 #Fake event pitcher for items still in folder at script restart
-"""def existing(handler, input_path):
+def existing(handler, input_path):
     for file in os.listdir(input_path):
-        full_path = os.path.join(input)"""
+        logger.info(f"File in input folder at startup. Now handling already existing file {file}.")
+        full_path = os.path.join(input_path, file)
 
-
-
+        #Throw fake event so typical logic doesn't need to be rewritten at each restart
+        if os.path.isfile(full_path):
+            fake_event = type("Fake Event", (object,), {})()
+            fake_event.src_path = full_path
+            fake_event.is_directory = False
+            handler.on_created(fake_event)
+            logger.info(f"Fake event thrown: {fake_event}")
 
 #-----Sysmon class object-----
 
@@ -227,7 +231,7 @@ if __name__ == "__main__":
     observer = Observer()
 
     #Process existing files by simulating events
-
+    existing(event_handler, input_path)
 
     #Schedule an observer thread to monitor the specified path with the custom handler
     #Recursive = true means it will also handle subdirectories
