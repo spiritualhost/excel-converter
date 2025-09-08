@@ -34,6 +34,12 @@ If you notice a missing feature, a bug, or an improvement, please submit a pull 
 
 I will try to review as soon as possible. Poke me if I forget. 
 
+### Future Potential Fixes
+
+- Handling for encrypted files in input folder (currently just throws exception) --> should be moved to manrev or decrypted forcefully if possible
+- Handling for other file formats that might come through (.xml, .html, .txt)
+- Command line flags for testing and other implementations would be nice
+
 ## Extensibility
 
 The program's flow of taking items placed in a folder, whether when it's running or not, could easily be extended to add different processing (e.g., encryption, alteration, compression), with minimal changes to the source code. I hope that this can be used for a variety of purposes and give users an easy jump ahead of wrangling with the initial balancing act between os and watchdog. 
