@@ -13,7 +13,7 @@
 #-------------------------------------------------------------------
 #Modification List
 #Date: 09/08/2025 by Ryan Piazza
-#Date: __/__/____ by _______________
+#Date: 09/10/2025 by Ryan Piazza   
 #Date: __/__/____ by _______________
 #Date: __/__/____ by _______________
 #Date: __/__/____ by _______________
@@ -89,8 +89,9 @@ def to_csv(file: str):
             logger.info(f"Converting sheet: {key} to CSV at exit path {exit_path}.")
 
             #Write contents of dataframe to tab separated (.csv)
+            #Uses "," by default
             with open(exit_path, "w"):
-                sheet_to_df_map[key].to_csv(exit_path, sep='\t')
+                sheet_to_df_map[key].to_csv(exit_path)
 
     except Exception as e:
         logger.warning(f"Conversion exception: {e}")
